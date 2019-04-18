@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.android.volley.Request.Method;
 import com.android.volley.mock.TestRequest;
-import com.android.volley.toolbox.HttpClientStack.HttpPatch;
+
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
