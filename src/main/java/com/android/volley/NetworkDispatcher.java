@@ -21,7 +21,9 @@ import android.net.TrafficStats;
 import android.os.Build;
 import android.os.Process;
 import android.os.SystemClock;
+
 import androidx.annotation.VisibleForTesting;
+
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -34,34 +36,37 @@ import java.util.concurrent.BlockingQueue;
  */
 public class NetworkDispatcher extends Thread {
 
-    /** The queue of requests to service. */
+    /**
+     * The queue of requests to service.
+     */
     private final BlockingQueue<Request<?>> mQueue;
-    /** The network interface for processing requests. */
+    /**
+     * The network interface for processing requests.
+     */
     private final Network mNetwork;
-    /** The cache to write to. */
-    private final Cache mCache;
-    /** For posting responses and errors. */
+    /**
+     * For posting responses and errors.
+     */
     private final ResponseDelivery mDelivery;
-    /** Used for telling us to die. */
+    /**
+     * Used for telling us to die.
+     */
     private volatile boolean mQuit = false;
 
     /**
      * Creates a new network dispatcher thread. You must call {@link #start()} in order to begin
      * processing.
      *
-     * @param queue Queue of incoming requests for triage
-     * @param network Network interface to use for performing requests
-     * @param cache Cache interface to use for writing responses to cache
+     * @param queue    Queue of incoming requests for triage
+     * @param network  Network interface to use for performing requests
      * @param delivery Delivery interface to use for posting responses
      */
     public NetworkDispatcher(
             BlockingQueue<Request<?>> queue,
             Network network,
-            Cache cache,
             ResponseDelivery delivery) {
         mQueue = queue;
         mNetwork = network;
-        mCache = cache;
         mDelivery = delivery;
     }
 
@@ -147,8 +152,8 @@ public class NetworkDispatcher extends Thread {
             // Write to cache if applicable.
             // TODO: Only update cache metadata instead of entire record for 304s.
             if (request.shouldCache() && response.cacheEntry != null) {
-                mCache.put(request.getCacheKey(), response.cacheEntry);
-                request.addMarker("network-cache-written");
+//                mCache.put(request.getCacheKey(), response.cacheEntry);
+//                request.addMarker("network-cache-written");
             }
 
             // Post the response back.

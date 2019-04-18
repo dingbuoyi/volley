@@ -17,31 +17,20 @@
 package com.android.volley.toolbox;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.http.AndroidHttpClient;
 import android.os.Build;
 
 import com.android.volley.Network;
 import com.android.volley.RequestQueue;
 
-import java.io.File;
-
 public class Volley {
-
-    /**
-     * Default on-disk cache directory.
-     */
-    private static final String DEFAULT_CACHE_DIR = "volley";
 
     /**
      * Creates a default instance of the worker pool and calls {@link RequestQueue#start()} on it.
      *
-     * @param context A {@link Context} to use for creating the cache dir.
-     * @param stack   A {@link BaseHttpStack} to use for the network, or null for default.
+     * @param stack A {@link BaseHttpStack} to use for the network, or null for default.
      * @return A started {@link RequestQueue} instance.
      */
-    public static RequestQueue newRequestQueue(Context context, BaseHttpStack stack) {
+    public static RequestQueue newRequestQueue(BaseHttpStack stack) {
         BasicNetwork network;
         if (stack == null) {
             if (Build.VERSION.SDK_INT >= 9) {
@@ -54,30 +43,11 @@ public class Volley {
             network = new BasicNetwork(stack);
         }
 
-        return newRequestQueue(context, network);
+        return newRequestQueue(network);
     }
 
-    /**
-     * Creates a default instance of the worker pool and calls {@link RequestQueue#start()} on it.
-     *
-     * @param context A {@link Context} to use for creating the cache dir.
-     * @param stack   An {@link HttpStack} to use for the network, or null for default.
-     * @return A started {@link RequestQueue} instance.
-     * @deprecated Use {@link #newRequestQueue(Context, BaseHttpStack)} instead to avoid depending
-     * on Apache HTTP. This method may be removed in a future release of Volley.
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public static RequestQueue newRequestQueue(Context context, HttpStack stack) {
-        if (stack == null) {
-            return newRequestQueue(context, (BaseHttpStack) null);
-        }
-        return newRequestQueue(context, new BasicNetwork(stack));
-    }
-
-    private static RequestQueue newRequestQueue(Context context, Network network) {
-        File cacheDir = new File(context.getCacheDir(), DEFAULT_CACHE_DIR);
-        RequestQueue queue = new RequestQueue(new DiskBasedCache(cacheDir), network);
+    private static RequestQueue newRequestQueue(Network network) {
+        RequestQueue queue = new RequestQueue(network);
         queue.start();
         return queue;
     }
@@ -85,10 +55,10 @@ public class Volley {
     /**
      * Creates a default instance of the worker pool and calls {@link RequestQueue#start()} on it.
      *
-     * @param context A {@link Context} to use for creating the cache dir.
      * @return A started {@link RequestQueue} instance.
      */
-    public static RequestQueue newRequestQueue(Context context) {
-        return newRequestQueue(context, (BaseHttpStack) null);
+    public static RequestQueue newRequestQueue() {
+        return newRequestQueue((BaseHttpStack) null);
     }
+
 }
