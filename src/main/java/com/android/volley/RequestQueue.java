@@ -147,11 +147,6 @@ public class RequestQueue {
      */
     private final NetworkDispatcher[] mDispatchers;
 
-    /**
-     * The cache dispatcher.
-     */
-    private CacheDispatcher mCacheDispatcher;
-
     private final List<RequestFinishedListener> mFinishedListeners = new ArrayList<>();
 
     /**
@@ -202,7 +197,13 @@ public class RequestQueue {
         // Create the cache dispatcher and start it.
 //        mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);
 //        mCacheDispatcher.start();
-
+        try {
+            mNetworkQueue.put(mCacheQueue.take());
+        } catch (InterruptedException e) {
+            VolleyLog.e(
+                    "Ignoring spurious interrupt of CacheDispatcher thread; "
+                            + "use quit() to terminate it");
+        }
         // Create network dispatchers (and corresponding threads) up to the pool size.
         for (int i = 0; i < mDispatchers.length; i++) {
             NetworkDispatcher networkDispatcher =
@@ -216,9 +217,6 @@ public class RequestQueue {
      * Stops the cache and network dispatchers.
      */
     public void stop() {
-        if (mCacheDispatcher != null) {
-            mCacheDispatcher.quit();
-        }
         for (final NetworkDispatcher mDispatcher : mDispatchers) {
             if (mDispatcher != null) {
                 mDispatcher.quit();

@@ -30,8 +30,7 @@ import java.util.concurrent.BlockingQueue;
  * Provides a thread for performing network dispatch from a queue of requests.
  *
  * <p>Requests added to the specified queue are processed from the network via a specified {@link
- * Network} interface. Responses are committed to cache, if eligible, using a specified {@link
- * Cache} interface. Valid responses and errors are posted back to the caller via a {@link
+ * Network} interface. Valid responses and errors are posted back to the caller via a {@link
  * ResponseDelivery}.
  */
 public class NetworkDispatcher extends Thread {
@@ -151,10 +150,10 @@ public class NetworkDispatcher extends Thread {
 
             // Write to cache if applicable.
             // TODO: Only update cache metadata instead of entire record for 304s.
-            if (request.shouldCache() && response.cacheEntry != null) {
+//            if (request.shouldCache() && response.cacheEntry != null) {
 //                mCache.put(request.getCacheKey(), response.cacheEntry);
 //                request.addMarker("network-cache-written");
-            }
+//            }
 
             // Post the response back.
             request.markDelivered();

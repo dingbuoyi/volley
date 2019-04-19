@@ -26,7 +26,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.android.volley.Request.Method;
 import com.android.volley.Request.Priority;
-import com.android.volley.toolbox.NoCache;
+
 import java.util.Collections;
 import java.util.Map;
 import org.junit.Before;

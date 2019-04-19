@@ -32,10 +32,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import com.android.volley.Cache;
 import com.android.volley.Header;
-import com.android.volley.toolbox.DiskBasedCache.CacheHeader;
-import com.android.volley.toolbox.DiskBasedCache.CountingInputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;

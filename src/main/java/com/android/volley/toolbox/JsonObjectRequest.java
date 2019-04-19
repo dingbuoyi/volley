@@ -17,12 +17,15 @@
 package com.android.volley.toolbox;
 
 import androidx.annotation.Nullable;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+
 import java.io.UnsupportedEncodingException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,11 +38,11 @@ public class JsonObjectRequest extends JsonRequest<JSONObject> {
     /**
      * Creates a new request.
      *
-     * @param method the HTTP method to use
-     * @param url URL to fetch the JSON from
-     * @param jsonRequest A {@link JSONObject} to post with the request. Null indicates no
-     *     parameters will be posted along with request.
-     * @param listener Listener to receive the JSON response
+     * @param method        the HTTP method to use
+     * @param url           URL to fetch the JSON from
+     * @param jsonRequest   A {@link JSONObject} to post with the request. Null indicates no
+     *                      parameters will be posted along with request.
+     * @param listener      Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
     public JsonObjectRequest(
@@ -83,7 +86,8 @@ public class JsonObjectRequest extends JsonRequest<JSONObject> {
                             response.data,
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
             return Response.success(
-                    new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
+                    //new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
+                    new JSONObject(jsonString)); // we removed the cache
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException je) {

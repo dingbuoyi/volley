@@ -21,10 +21,13 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.Nullable;
+
 import com.android.volley.VolleyLog.MarkerLog;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
@@ -37,10 +40,14 @@ import java.util.Map;
  */
 public abstract class Request<T> implements Comparable<Request<T>> {
 
-    /** Default encoding for POST or PUT parameters. See {@link #getParamsEncoding()}. */
+    /**
+     * Default encoding for POST or PUT parameters. See {@link #getParamsEncoding()}.
+     */
     private static final String DEFAULT_PARAMS_ENCODING = "UTF-8";
 
-    /** Supported request methods. */
+    /**
+     * Supported request methods.
+     */
     public interface Method {
         int DEPRECATED_GET_OR_POST = -1;
         int GET = 0;
@@ -53,17 +60,25 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         int PATCH = 7;
     }
 
-    /** Callback to notify when the network request returns. */
+    /**
+     * Callback to notify when the network request returns.
+     */
     /* package */ interface NetworkRequestCompleteListener {
 
-        /** Callback when a network response has been received. */
+        /**
+         * Callback when a network response has been received.
+         */
         void onResponseReceived(Request<?> request, Response<?> response);
 
-        /** Callback when request returns from network without valid response. */
+        /**
+         * Callback when request returns from network without valid response.
+         */
         void onNoUsableResponseReceived(Request<?> request);
     }
 
-    /** An event log tracing the lifetime of this request; for debugging. */
+    /**
+     * An event log tracing the lifetime of this request; for debugging.
+     */
     private final MarkerLog mEventLog = MarkerLog.ENABLED ? new MarkerLog() : null;
 
     /**
@@ -72,55 +87,74 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     private final int mMethod;
 
-    /** URL of this request. */
+    /**
+     * URL of this request.
+     */
     private final String mUrl;
 
-    /** Default tag for {@link TrafficStats}. */
+    /**
+     * Default tag for {@link TrafficStats}.
+     */
     private final int mDefaultTrafficStatsTag;
 
-    /** Lock to guard state which can be mutated after a request is added to the queue. */
+    /**
+     * Lock to guard state which can be mutated after a request is added to the queue.
+     */
     private final Object mLock = new Object();
 
-    /** Listener interface for errors. */
+    /**
+     * Listener interface for errors.
+     */
     @Nullable
     @GuardedBy("mLock")
     private Response.ErrorListener mErrorListener;
 
-    /** Sequence number of this request, used to enforce FIFO ordering. */
+    /**
+     * Sequence number of this request, used to enforce FIFO ordering.
+     */
     private Integer mSequence;
 
-    /** The request queue this request is associated with. */
+    /**
+     * The request queue this request is associated with.
+     */
     private RequestQueue mRequestQueue;
 
-    /** Whether or not responses to this request should be cached. */
+    /**
+     * Whether or not responses to this request should be cached.
+     */
     // TODO(#190): Turn this off by default for anything other than GET requests.
     private boolean mShouldCache = true;
 
-    /** Whether or not this request has been canceled. */
+    /**
+     * Whether or not this request has been canceled.
+     */
     @GuardedBy("mLock")
     private boolean mCanceled = false;
 
-    /** Whether or not a response has been delivered for this request yet. */
+    /**
+     * Whether or not a response has been delivered for this request yet.
+     */
     @GuardedBy("mLock")
     private boolean mResponseDelivered = false;
 
-    /** Whether the request should be retried in the event of an HTTP 5xx (server) error. */
+    /**
+     * Whether the request should be retried in the event of an HTTP 5xx (server) error.
+     */
     private boolean mShouldRetryServerErrors = false;
 
-    /** The retry policy for this request. */
+    /**
+     * The retry policy for this request.
+     */
     private RetryPolicy mRetryPolicy;
 
     /**
-     * When a request can be retrieved from cache but must be refreshed from the network, the cache
-     * entry will be stored here so that in the event of a "Not Modified" response, we can be sure
-     * it hasn't been evicted from cache.
+     * An opaque token tagging this request; used for bulk cancellation.
      */
-    private Cache.Entry mCacheEntry = null;
-
-    /** An opaque token tagging this request; used for bulk cancellation. */
     private Object mTag;
 
-    /** Listener that will be notified when a response has been delivered. */
+    /**
+     * Listener that will be notified when a response has been delivered.
+     */
     @GuardedBy("mLock")
     private NetworkRequestCompleteListener mRequestCompleteListener;
 
@@ -151,7 +185,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         mDefaultTrafficStatsTag = findDefaultTrafficStatsTag(url);
     }
 
-    /** Return the method for this request. Can be one of the values in {@link Method}. */
+    /**
+     * Return the method for this request. Can be one of the values in {@link Method}.
+     */
     public int getMethod() {
         return mMethod;
     }
@@ -176,7 +212,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return mTag;
     }
 
-    /** @return this request's {@link com.android.volley.Response.ErrorListener}. */
+    /**
+     * @return this request's {@link com.android.volley.Response.ErrorListener}.
+     */
     @Nullable
     public Response.ErrorListener getErrorListener() {
         synchronized (mLock) {
@@ -184,12 +222,16 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         }
     }
 
-    /** @return A tag for use with {@link TrafficStats#setThreadStatsTag(int)} */
+    /**
+     * @return A tag for use with {@link TrafficStats#setThreadStatsTag(int)}
+     */
     public int getTrafficStatsTag() {
         return mDefaultTrafficStatsTag;
     }
 
-    /** @return The hashcode of the URL's host component, or 0 if there is none. */
+    /**
+     * @return The hashcode of the URL's host component, or 0 if there is none.
+     */
     private static int findDefaultTrafficStatsTag(String url) {
         if (!TextUtils.isEmpty(url)) {
             Uri uri = Uri.parse(url);
@@ -213,7 +255,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return this;
     }
 
-    /** Adds an event to this request's event log; for debugging. */
+    /**
+     * Adds an event to this request's event log; for debugging.
+     */
     public void addMarker(String tag) {
         if (MarkerLog.ENABLED) {
             mEventLog.add(tag, Thread.currentThread().getId());
@@ -278,7 +322,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return this;
     }
 
-    /** Returns the sequence number of this request. */
+    /**
+     * Returns the sequence number of this request.
+     */
     public final int getSequence() {
         if (mSequence == null) {
             throw new IllegalStateException("getSequence called before setSequence");
@@ -286,12 +332,16 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return mSequence;
     }
 
-    /** Returns the URL of this request. */
+    /**
+     * Returns the URL of this request.
+     */
     public String getUrl() {
         return mUrl;
     }
 
-    /** Returns the cache key for this request. By default, this is the URL. */
+    /**
+     * Returns the cache key for this request. By default, this is the URL.
+     */
     public String getCacheKey() {
         String url = getUrl();
         // If this is a GET request, just use the URL as the key.
@@ -308,32 +358,16 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     }
 
     /**
-     * Annotates this request with an entry retrieved for it from cache. Used for cache coherency
-     * support.
-     *
-     * @return This Request object to allow for chaining.
-     */
-    public Request<?> setCacheEntry(Cache.Entry entry) {
-        mCacheEntry = entry;
-        return this;
-    }
-
-    /** Returns the annotated cache entry, or null if there isn't one. */
-    public Cache.Entry getCacheEntry() {
-        return mCacheEntry;
-    }
-
-    /**
      * Mark this request as canceled.
      *
      * <p>No callback will be delivered as long as either:
      *
      * <ul>
-     *   <li>This method is called on the same thread as the {@link ResponseDelivery} is running on.
-     *       By default, this is the main thread.
-     *   <li>The request subclass being used overrides cancel() and ensures that it does not invoke
-     *       the listener in {@link #deliverResponse} after cancel() has been called in a
-     *       thread-safe manner.
+     * <li>This method is called on the same thread as the {@link ResponseDelivery} is running on.
+     * By default, this is the main thread.
+     * <li>The request subclass being used overrides cancel() and ensures that it does not invoke
+     * the listener in {@link #deliverResponse} after cancel() has been called in a
+     * thread-safe manner.
      * </ul>
      *
      * <p>There are no guarantees if both of these conditions aren't met.
@@ -346,7 +380,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         }
     }
 
-    /** Returns true if this request has been canceled. */
+    /**
+     * Returns true if this request has been canceled.
+     */
     public boolean isCanceled() {
         synchronized (mLock) {
             return mCanceled;
@@ -385,10 +421,10 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * <p>This controls both encodings:
      *
      * <ol>
-     *   <li>The string encoding used when converting parameter names and values into bytes prior to
-     *       URL encoding them.
-     *   <li>The string encoding used when converting the URL encoded parameters into a raw byte
-     *       array.
+     * <li>The string encoding used when converting parameter names and values into bytes prior to
+     * URL encoding them.
+     * <li>The string encoding used when converting the URL encoded parameters into a raw byte
+     * array.
      * </ol>
      *
      * @deprecated Use {@link #getParamsEncoding()} instead.
@@ -398,7 +434,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return getParamsEncoding();
     }
 
-    /** @deprecated Use {@link #getBodyContentType()} instead. */
+    /**
+     * @deprecated Use {@link #getBodyContentType()} instead.
+     */
     @Deprecated
     public String getPostBodyContentType() {
         return getBodyContentType();
@@ -442,17 +480,19 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * <p>This controls both encodings:
      *
      * <ol>
-     *   <li>The string encoding used when converting parameter names and values into bytes prior to
-     *       URL encoding them.
-     *   <li>The string encoding used when converting the URL encoded parameters into a raw byte
-     *       array.
+     * <li>The string encoding used when converting parameter names and values into bytes prior to
+     * URL encoding them.
+     * <li>The string encoding used when converting the URL encoded parameters into a raw byte
+     * array.
      * </ol>
      */
     protected String getParamsEncoding() {
         return DEFAULT_PARAMS_ENCODING;
     }
 
-    /** Returns the content type of the POST or PUT body. */
+    /**
+     * Returns the content type of the POST or PUT body.
+     */
     public String getBodyContentType() {
         return "application/x-www-form-urlencoded; charset=" + getParamsEncoding();
     }
@@ -474,7 +514,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return null;
     }
 
-    /** Converts <code>params</code> into an application/x-www-form-urlencoded encoded string. */
+    /**
+     * Converts <code>params</code> into an application/x-www-form-urlencoded encoded string.
+     */
     private byte[] encodeParameters(Map<String, String> params, String paramsEncoding) {
         StringBuilder encodedParams = new StringBuilder();
         try {
@@ -508,7 +550,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return this;
     }
 
-    /** Returns true if responses to this request should be cached. */
+    /**
+     * Returns true if responses to this request should be cached.
+     */
     public final boolean shouldCache() {
         return mShouldCache;
     }
@@ -541,7 +585,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         IMMEDIATE
     }
 
-    /** Returns the {@link Priority} of this request; {@link Priority#NORMAL} by default. */
+    /**
+     * Returns the {@link Priority} of this request; {@link Priority#NORMAL} by default.
+     */
     public Priority getPriority() {
         return Priority.NORMAL;
     }
@@ -555,7 +601,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return getRetryPolicy().getCurrentTimeout();
     }
 
-    /** Returns the retry policy that should be used for this request. */
+    /**
+     * Returns the retry policy that should be used for this request.
+     */
     public RetryPolicy getRetryPolicy() {
         return mRetryPolicy;
     }
@@ -570,7 +618,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         }
     }
 
-    /** Returns true if this request has had a response delivered for it. */
+    /**
+     * Returns true if this request has had a response delivered for it.
+     */
     public boolean hasHadResponseDelivered() {
         synchronized (mLock) {
             return mResponseDelivered;
@@ -605,7 +655,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * delivered.
      *
      * @param response The parsed response returned by {@link
-     *     #parseNetworkResponse(NetworkResponse)}
+     *                 #parseNetworkResponse(NetworkResponse)}
      */
     protected abstract void deliverResponse(T response);
 

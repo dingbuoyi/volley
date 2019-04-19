@@ -28,7 +28,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import com.android.volley.toolbox.NoCache;
 import com.android.volley.toolbox.StringRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

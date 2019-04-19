@@ -18,17 +18,23 @@ package com.android.volley.toolbox;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.Nullable;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+
 import java.io.UnsupportedEncodingException;
 
-/** A canned request for retrieving the response body at a given URL as a String. */
+/**
+ * A canned request for retrieving the response body at a given URL as a String.
+ */
 public class StringRequest extends Request<String> {
 
-    /** Lock to guard mListener as it is cleared on cancel() and read on delivery. */
+    /**
+     * Lock to guard mListener as it is cleared on cancel() and read on delivery.
+     */
     private final Object mLock = new Object();
 
     @Nullable
@@ -38,9 +44,9 @@ public class StringRequest extends Request<String> {
     /**
      * Creates a new request with the given method.
      *
-     * @param method the request {@link Method} to use
-     * @param url URL to fetch the string at
-     * @param listener Listener to receive the String response
+     * @param method        the request {@link Method} to use
+     * @param url           URL to fetch the string at
+     * @param listener      Listener to receive the String response
      * @param errorListener Error listener, or null to ignore errors
      */
     public StringRequest(
@@ -55,8 +61,8 @@ public class StringRequest extends Request<String> {
     /**
      * Creates a new GET request.
      *
-     * @param url URL to fetch the string at
-     * @param listener Listener to receive the String response
+     * @param url           URL to fetch the string at
+     * @param listener      Listener to receive the String response
      * @param errorListener Error listener, or null to ignore errors
      */
     public StringRequest(
@@ -95,6 +101,7 @@ public class StringRequest extends Request<String> {
             // So suppress the warning instead.
             parsed = new String(response.data);
         }
-        return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
+        //return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
+        return Response.success(parsed); // we removed the cache
     }
 }
